@@ -662,10 +662,46 @@ installed_tools() {
     done
 }
 
+
+dashboard() {
+    local catalog_count=0
+    local local_count=0
+
+    if [ -f "$CATALOG" ]; then
+        catalog_count=$(grep -cE '^[0-9]{3}\|' "$CATALOG" 2>/dev/null || echo 0)
+    fi
+
+    if [ -d "$TOOLS" ]; then
+        local_count=$(find "$TOOLS" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+    fi
+
+    echo -e "${C}════════════════════════════════════════════════════════${N}"
+    echo -e "${Y}                    TOOLBOX DASHBOARD${N}"
+    echo -e "${C}════════════════════════════════════════════════════════${N}"
+    echo -e "${W}Catalog tools:${N}       $catalog_count"
+    echo -e "${W}Local modules:${N}       $local_count"
+
+    if command -v pkg >/dev/null 2>&1; then
+        echo -e "${W}Termux:${N}              Ready"
+    else
+        echo -e "${W}Termux:${N}              Not detected"
+    fi
+
+    if [ -f "$CATALOG" ]; then
+        echo -e "${W}Catalog:${N}             Available"
+    else
+        echo -e "${W}Catalog:${N}             Missing"
+    fi
+
+    echo -e "${C}════════════════════════════════════════════════════════${N}"
+    echo
+}
+
 main() {
     while true
     do
         banner
+        dashboard
 
         echo -e "${Y}[1]${N} Browse Tools"
         echo -e "${Y}[2]${N} Categories"
