@@ -596,6 +596,7 @@ installed_tools() {
         echo
         echo -e "${C}[I]${N} Tool information"
         echo -e "${C}[O]${N} Open tool directory"
+        echo -e "${C}[U]${N} Update Git tool"
         echo -e "${C}[R]${N} Remove local tool"
         echo -e "${C}[Q]${N} Back"
         echo
@@ -649,6 +650,41 @@ installed_tools() {
                         echo -e "${C}README:${N}"
                         echo
                         sed -n '1,80p' "$target/README.md"
+                    fi
+
+                    echo
+                    read -rp "Press Enter to return..."
+                else
+                    echo -e "${R}[!] Invalid tool number.${N}"
+                    sleep 1
+                fi
+                ;;
+
+            u)
+                read -rp "Enter tool number to update: " num
+
+                if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#dirs[@]}" ]; then
+                    target="${dirs[$((num-1))]}"
+                    name="$(basename "$target")"
+
+                    echo
+                    echo -e "${C}Updating:${N} ${W}$name${N}"
+                    echo
+
+                    if [ ! -d "$target/.git" ]; then
+                        echo -e "${Y}[i] This tool is not a Git repository.${N}"
+                        echo -e "${Y}[i] Automatic updating is available only for Git-based tools.${N}"
+                    elif ! command -v git >/dev/null 2>&1; then
+                        echo -e "${R}[!] Git is not installed.${N}"
+                    else
+                        if git -C "$target" pull --ff-only; then
+                            echo
+                            echo -e "${G}[✓] $name updated successfully.${N}"
+                        else
+                            echo
+                            echo -e "${R}[!] Update failed or could not be fast-forwarded.${N}"
+                            echo -e "${Y}[i] Your existing files were left unchanged by the failed update.${N}"
+                        fi
                     fi
 
                     echo
