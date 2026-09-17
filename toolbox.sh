@@ -561,6 +561,7 @@ installed_tools() {
         fi
 
         echo
+        echo -e "${C}[I]${N} Tool information"
         echo -e "${C}[O]${N} Open tool directory"
         echo -e "${C}[R]${N} Remove local tool"
         echo -e "${C}[Q]${N} Back"
@@ -578,11 +579,45 @@ installed_tools() {
                 read -rp "Enter tool number: " num
 
                 if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#dirs[@]}" ]; then
-                    cd "${dirs[$((num-1))]}" || continue
+                    target="${dirs[$((num-1))]}"
+
                     echo
-                    echo -e "${G}Opened:${N} $(pwd)"
+                    echo -e "${G}Directory:${N} $target"
                     echo
-                    ls -la
+                    ls -lah -- "$target"
+                    echo
+                    read -rp "Press Enter to return..."
+                else
+                    echo -e "${R}[!] Invalid tool number.${N}"
+                    sleep 1
+                fi
+                ;;
+
+            i)
+                read -rp "Enter tool number: " num
+
+                if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#dirs[@]}" ]; then
+                    target="${dirs[$((num-1))]}"
+                    name="$(basename "$target")"
+
+                    echo
+                    echo -e "${C}════════════════════════════════════════════════════════${N}"
+                    echo -e "${Y}TOOL INFORMATION${N}"
+                    echo -e "${C}════════════════════════════════════════════════════════${N}"
+                    echo -e "${W}Name:${N}      $name"
+                    echo -e "${W}Location:${N}  $target"
+
+                    if command -v du >/dev/null 2>&1; then
+                        echo -e "${W}Size:${N}      $(du -sh -- "$target" 2>/dev/null | awk '{print $1}')"
+                    fi
+
+                    if [ -f "$target/README.md" ]; then
+                        echo
+                        echo -e "${C}README:${N}"
+                        echo
+                        sed -n '1,80p' "$target/README.md"
+                    fi
+
                     echo
                     read -rp "Press Enter to return..."
                 else
