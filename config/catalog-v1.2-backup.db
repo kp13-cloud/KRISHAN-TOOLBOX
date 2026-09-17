@@ -1,0 +1,30 @@
+001|Git|Development|Version control system|pkg|git
+002|Python|Development|Python programming language|pkg|python
+003|NodeJS|Development|JavaScript runtime|pkg|nodejs
+004|PHP|Development|PHP programming language|pkg|php
+005|Ruby|Development|Ruby programming language|pkg|ruby
+006|Make|Development|Build automation utility|pkg|make
+007|CMake|Development|Cross-platform build system|pkg|cmake
+008|Clang|Development|C/C++ compiler|pkg|clang
+009|Curl|Networking|Command-line HTTP client|pkg|curl
+010|Wget|Networking|Network downloader|pkg|wget
+011|OpenSSH|Networking|SSH client and server|pkg|openssh
+012|Nmap|Security Learning|Network discovery and auditing|pkg|nmap
+013|Netcat|Networking|Network utility|pkg|netcat-openbsd
+014|DNS Utils|Networking|DNS lookup utilities|pkg|dnsutils
+015|Whois|Networking|Domain registration lookup|pkg|whois
+016|Tree|System|Directory tree viewer|pkg|tree
+017|Zip|System|ZIP archive utility|pkg|zip
+018|Unzip|System|ZIP extraction utility|pkg|unzip
+019|Nano|Development|Terminal text editor|pkg|nano
+020|Vim|Development|Terminal text editor|pkg|vim
+021|JQ|Development|JSON command-line processor|pkg|jq
+022|HTop|System|Interactive process viewer|pkg|htop
+023|SQLite|Development|SQLite database engine|pkg|sqlite
+024|Grep|System|Text searching utility|pkg|grep
+025|Sed|System|Stream editor|pkg|sed
+026|Awk|System|Text processing utility|pkg|gawk
+027|Learning Lab|Security Learning|Authorized security-learning exercises|local|learning
+028|HTTP Toolkit|Security Learning|HTTP concepts and diagnostics|github|https://github.com/example/http-toolkit.git
+029|CLI Practice|Learning|Command-line practice module|local|cli
+030|Git Practice|Learning|Git learning module|local|gitpractice
