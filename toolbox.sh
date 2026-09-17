@@ -31,7 +31,7 @@ banner() {
         echo "========================"
     fi
     printf "${N}"
-    echo -e "${M}        V1.1${N}"
+    echo -e "${M}        V2.7${N}"
     echo -e "${W}  $(total_tools) Modular Termux Tools${N}"
     echo -e "${C}  Created by KRISHAN SINGH SIDHU${N}"
     echo
@@ -538,9 +538,70 @@ health_check() {
     read -p "Press Enter..."
 }
 
+help_menu() {
+    while true; do
+        clear
+        banner
+
+        echo -e "${C}════════════════════════════════════════════════════════${N}"
+        echo -e "${Y}                       HELP${N}"
+        echo -e "${C}════════════════════════════════════════════════════════${N}"
+        echo
+        echo -e "${W}KRISHAN TOOLBOX${N}"
+        echo
+        echo "1. Browse Tools"
+        echo "   Browse the complete tool catalog by pages."
+        echo
+        echo "2. Categories"
+        echo "   View tools grouped by category."
+        echo
+        echo "3. Search"
+        echo "   Search tool names, categories, and descriptions."
+        echo
+        echo "4. Install by Number"
+        echo "   Install a catalog entry using its ID."
+        echo
+        echo "5. Tool Info"
+        echo "   View detailed information about a catalog entry."
+        echo
+        echo "6. Update Termux"
+        echo "   Refresh Termux packages using pkg."
+        echo
+        echo "7. Favorites"
+        echo "   Save frequently used catalog entries."
+        echo
+        echo "8. System Health"
+        echo "   Check the toolbox environment."
+        echo
+        echo "9. About"
+        echo "   View project information and version."
+        echo
+        echo "10. Update Tool Catalog"
+        echo "    Safely download and validate the latest catalog."
+        echo
+        echo "11. Installed Tools"
+        echo "    Manage locally installed tools."
+        echo
+        echo "12. Backup & Restore"
+        echo "    Back up or restore toolbox configuration."
+        echo
+        echo -e "${C}────────────────────────────────────────────────────────${N}"
+        echo
+        echo "[Q] Back"
+        echo
+
+        read -rp "Select: " choice
+
+        case "$choice" in
+            q|Q) return ;;
+            *) echo "[!] Invalid option."; sleep 1 ;;
+        esac
+    done
+}
+
 about() {
     banner
-    echo -e "${W}KRISHAN TOOLBOX V1.1${N}"
+    echo -e "${W}KRISHAN TOOLBOX V2.7${N}"
     echo
     echo "A modular Termux utility manager."
     echo
@@ -773,7 +834,7 @@ dashboard() {
             }
             END {
                 for (category in count)
-                    printf "  %-20s %d\\n", category ":", count[category]
+                    printf "  %-20s %d\n", category ":", count[category]
             }
         ' "$CATALOG" | sort
     fi
@@ -884,7 +945,8 @@ main() {
         echo -e "${Y}[10]${N} Update Tool Catalog"
         echo -e "${Y}[11]${N} Installed Tools"
         echo -e "${Y}[12]${N} Backup & Restore"
-        echo -e "${Y}[13]${N} Exit"
+        echo -e "${Y}[13]${N} Help"
+        echo -e "${Y}[14]${N} Exit"
         echo
 
         read -p "Select: " option
@@ -935,6 +997,9 @@ main() {
                 ;;
 
             13)
+                help_menu
+                ;;
+            14)
                 clear
                 exit 0
                 ;;
