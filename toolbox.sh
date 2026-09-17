@@ -30,7 +30,7 @@ banner() {
     fi
     printf "${N}"
     echo -e "${M}        V1.1${N}"
-    echo -e "${W}  400+ Modular Termux Tools${N}"
+    echo -e "${W}  $(total_tools) Modular Termux Tools${N}"
     echo -e "${C}  Created by KRISHAN SINGH SIDHU${N}"
     echo
 }
@@ -151,6 +151,48 @@ search_tools() {
     [ -n "$id" ] && install_tool "$id"
 }
 
+tool_info() {
+    local id="$1"
+    local entry
+
+    entry=$(grep "^$(printf '%03d' "$id")|" "$CATALOG")
+    [ -z "$entry" ] && entry=$(grep "^$id|" "$CATALOG")
+
+    if [ -z "$entry" ]; then
+        echo -e "${R}Tool $id not found.${N}"
+        return
+    fi
+
+    IFS='|' read -r num name category description type target dependencies <<< "$entry"
+
+    echo
+    echo -e "${C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
+    echo -e "${Y}Tool Information${N}"
+    echo -e "${C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
+    echo
+    echo -e "${W}ID:${N}          $num"
+    echo -e "${W}Name:${N}        $name"
+    echo -e "${W}Category:${N}    $category"
+    echo -e "${W}Description:${N} $description"
+    echo -e "${W}Source:${N}       $type"
+    echo -e "${W}Target:${N}       $target"
+
+    if [ -n "$dependencies" ]; then
+        echo -e "${W}Dependencies:${N} $dependencies"
+    else
+        echo -e "${W}Dependencies:${N} None"
+    fi
+
+    if is_installed "$type" "$target"; then
+        echo -e "${W}Status:${N}       ${G}Installed${N}"
+    else
+        echo -e "${W}Status:${N}       ${R}Not installed${N}"
+    fi
+
+    echo
+    echo -e "${C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
+}
+ 
 install_tool() {
     local id="$1"
 
@@ -315,10 +357,11 @@ main() {
         echo -e "${Y}[2]${N} Categories"
         echo -e "${Y}[3]${N} Search"
         echo -e "${Y}[4]${N} Install by Number"
-        echo -e "${Y}[5]${N} Update Termux"
-        echo -e "${Y}[6]${N} About"
-        echo -e "${Y}[7]${N} Update Tool Catalog"
-        echo -e "${Y}[8]${N} Exit"
+        echo -e "${Y}[5]${N} Tool Info"
+        echo -e "${Y}[6]${N} Update Termux"
+        echo -e "${Y}[7]${N} About"
+        echo -e "${Y}[8]${N} Update Tool Catalog"
+        echo -e "${Y}[9]${N} Exit"
         echo
 
         read -p "Select: " option
@@ -327,40 +370,37 @@ main() {
             1)
                 browse_tools
                 ;;
-
             2)
                 categories
                 ;;
-
             3)
                 search_tools
                 read -p "Press Enter..."
                 ;;
-
             4)
                 read -p "Tool number: " id
                 install_tool "$id"
                 read -p "Press Enter..."
                 ;;
-
             5)
+                read -p "Tool number: " id
+                tool_info "$id"
+                read -p "Press Enter..."
+                ;;
+            6)
                 pkg update
                 ;;
-
-            6)
+            7)
                 about
                 ;;
-
-            7)
+            8)
                 bash "$BASE_DIR/modules/update-catalog.sh"
                 read -p "Press Enter..."
                 ;;
-
-            8)
+            9)
                 clear
                 exit 0
                 ;;
-
             *)
                 echo -e "${R}Invalid option.${N}"
                 sleep 1
