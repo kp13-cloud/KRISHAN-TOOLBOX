@@ -2,6 +2,7 @@
 
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 CATALOG="$BASE_DIR/config/catalog.db"
+FAVORITES="$BASE_DIR/config/favorites.db"
 CACHE="$BASE_DIR/cache"
 TOOLS="$BASE_DIR/tools"
 
@@ -744,6 +745,90 @@ dashboard() {
     echo
 }
 
+
+favorites() {
+    while true; do
+        clear
+        banner
+
+        echo -e "${C}════════════════════════════════════════════════════════${N}"
+        echo -e "${Y}                      FAVORITES${N}"
+        echo -e "${C}════════════════════════════════════════════════════════${N}"
+        echo
+
+        local found=0
+
+        if [ -s "$FAVORITES" ]; then
+            while IFS= read -r fav_id; do
+                [ -z "$fav_id" ] && continue
+
+                local line
+                line=$(grep -E "^${fav_id}\|" "$CATALOG" | head -n 1)
+
+                if [ -n "$line" ]; then
+                    IFS='|' read -r id name category description type target deps <<< "$line"
+                    echo -e "${Y}[$id]${N} ${W}$name${N}"
+                    echo -e "     $category — $description"
+                    found=1
+                fi
+            done < "$FAVORITES"
+        fi
+
+        if [ "$found" -eq 0 ]; then
+            echo -e "${Y}No favorite tools yet.${N}"
+        fi
+
+        echo
+        echo -e "${C}[A]${N} Add favorite"
+        echo -e "${C}[R]${N} Remove favorite"
+        echo -e "${C}[Q]${N} Back"
+        echo
+
+        read -rp "Select: " choice
+        choice="${choice,,}"
+
+        case "$choice" in
+            a)
+                read -rp "Enter tool number: " id
+
+                if grep -qE "^${id}\|" "$CATALOG"; then
+                    if grep -qx "$id" "$FAVORITES" 2>/dev/null; then
+                        echo -e "${Y}[i] Already in favorites.${N}"
+                    else
+                        echo "$id" >> "$FAVORITES"
+                        echo -e "${G}[✓] Added to favorites.${N}"
+                    fi
+                else
+                    echo -e "${R}[!] Invalid tool number.${N}"
+                fi
+                sleep 1
+                ;;
+
+            r)
+                read -rp "Enter tool number to remove: " id
+
+                if grep -qx "$id" "$FAVORITES" 2>/dev/null; then
+                    grep -vx "$id" "$FAVORITES" > "$FAVORITES.tmp"
+                    mv "$FAVORITES.tmp" "$FAVORITES"
+                    echo -e "${G}[✓] Removed from favorites.${N}"
+                else
+                    echo -e "${Y}[i] Tool is not in favorites.${N}"
+                fi
+                sleep 1
+                ;;
+
+            q)
+                return
+                ;;
+
+            *)
+                echo -e "${R}[!] Invalid option.${N}"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
 main() {
     while true
     do
@@ -756,11 +841,12 @@ main() {
         echo -e "${Y}[4]${N} Install by Number"
         echo -e "${Y}[5]${N} Tool Info"
         echo -e "${Y}[6]${N} Update Termux"
-        echo -e "${Y}[7]${N} System Health"
-        echo -e "${Y}[8]${N} About"
-        echo -e "${Y}[9]${N} Update Tool Catalog"
-        echo -e "${Y}[10]${N} Installed Tools"
-        echo -e "${Y}[11]${N} Exit"
+        echo -e "${Y}[7]${N} Favorites"
+        echo -e "${Y}[8]${N} System Health"
+        echo -e "${Y}[9]${N} About"
+        echo -e "${Y}[10]${N} Update Tool Catalog"
+        echo -e "${Y}[11]${N} Installed Tools"
+        echo -e "${Y}[12]${N} Exit"
         echo
 
         read -p "Select: " option
@@ -790,20 +876,23 @@ main() {
                 pkg update
                 ;;
             7)
-                health_check
+                favorites
                 ;;
             8)
-                about
+                health_check
                 ;;
             9)
+                about
+                ;;
+            10)
                 bash "$BASE_DIR/modules/update-catalog.sh"
                 read -p "Press Enter..."
                 ;;
-            10)
+            11)
                 installed_tools
                 ;;
 
-            11)
+            12)
                 clear
                 exit 0
                 ;;
