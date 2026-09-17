@@ -327,6 +327,91 @@ categories() {
     [ -n "$id" ] && install_tool "$id"
 }
 
+health_check() {
+    banner
+
+    echo -e "${Y}KRISHAN TOOLBOX - SYSTEM HEALTH${N}"
+    echo
+
+    check_ok() {
+        echo -e "${G}[✓]${N} $1"
+    }
+
+    check_fail() {
+        echo -e "${R}[!]${N} $1"
+    }
+
+    if command -v bash >/dev/null 2>&1; then
+        check_ok "Bash available"
+    else
+        check_fail "Bash missing"
+    fi
+
+    if command -v git >/dev/null 2>&1; then
+        check_ok "Git available"
+    else
+        check_fail "Git missing"
+    fi
+
+    if command -v curl >/dev/null 2>&1; then
+        check_ok "Curl available"
+    else
+        check_fail "Curl missing"
+    fi
+
+    if [ -d "$TOOLS" ]; then
+        check_ok "Tools directory"
+    else
+        check_fail "Tools directory missing"
+    fi
+
+    if [ -d "$CACHE" ]; then
+        check_ok "Cache directory"
+    else
+        check_fail "Cache directory missing"
+    fi
+
+    if [ -f "$CATALOG" ]; then
+        check_ok "Catalog found"
+    else
+        check_fail "Catalog missing"
+    fi
+
+    if [ -f "$CATALOG" ]; then
+        bad=$(awk -F'|' 'NF != 7 {count++} END {print count+0}' "$CATALOG")
+
+        if [ "$bad" -eq 0 ]; then
+            check_ok "Catalog format valid"
+        else
+            check_fail "Catalog has $bad invalid entries"
+        fi
+    fi
+
+    if bash -n "$BASE_DIR/toolbox.sh" 2>/dev/null; then
+        check_ok "toolbox.sh syntax"
+    else
+        check_fail "toolbox.sh syntax error"
+    fi
+
+    if bash -n "$BASE_DIR/modules/dependencies.sh" 2>/dev/null; then
+        check_ok "dependencies.sh syntax"
+    else
+        check_fail "dependencies.sh syntax error"
+    fi
+
+    if bash -n "$BASE_DIR/modules/update-catalog.sh" 2>/dev/null; then
+        check_ok "update-catalog.sh syntax"
+    else
+        check_fail "update-catalog.sh syntax error"
+    fi
+
+    echo
+    echo -e "${C}Catalog entries:${N} $(total_tools)"
+    echo -e "${C}Installed tools:${N} $(grep -c '^[0-9]' "$CATALOG" 2>/dev/null || echo 0)"
+    echo
+    read -p "Press Enter..."
+}
+
 about() {
     banner
     echo -e "${W}KRISHAN TOOLBOX V1.1${N}"
@@ -359,9 +444,10 @@ main() {
         echo -e "${Y}[4]${N} Install by Number"
         echo -e "${Y}[5]${N} Tool Info"
         echo -e "${Y}[6]${N} Update Termux"
-        echo -e "${Y}[7]${N} About"
-        echo -e "${Y}[8]${N} Update Tool Catalog"
-        echo -e "${Y}[9]${N} Exit"
+        echo -e "${Y}[7]${N} System Health"
+        echo -e "${Y}[8]${N} About"
+        echo -e "${Y}[9]${N} Update Tool Catalog"
+        echo -e "${Y}[10]${N} Exit"
         echo
 
         read -p "Select: " option
@@ -391,13 +477,16 @@ main() {
                 pkg update
                 ;;
             7)
-                about
+                health_check
                 ;;
             8)
+                about
+                ;;
+            9)
                 bash "$BASE_DIR/modules/update-catalog.sh"
                 read -p "Press Enter..."
                 ;;
-            9)
+            10)
                 clear
                 exit 0
                 ;;
