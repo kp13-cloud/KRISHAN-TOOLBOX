@@ -3,28 +3,48 @@
 003|NodeJS|Development|JavaScript runtime|pkg|nodejs|
 004|PHP|Development|PHP programming language|pkg|php|
 005|Ruby|Development|Ruby programming language|pkg|ruby|
-006|Make|Development|Build automation utility|pkg|make|
-007|CMake|Development|Cross-platform build system|pkg|cmake|
-008|Clang|Development|C/C++ compiler|pkg|clang|
-009|Curl|Networking|Command-line HTTP client|pkg|curl|
-010|Wget|Networking|Network downloader|pkg|wget|
-011|OpenSSH|Networking|SSH client/server|pkg|openssh|
-012|Nmap|Security Learning|Network discovery and auditing|pkg|nmap|
-013|Netcat|Networking|Network utility|pkg|netcat-openbsd|
-014|DNS Utils|Networking|DNS lookup utilities|pkg|dnsutils|
-015|Whois|Networking|Domain registration lookup|pkg|whois|
-016|Tree|System|Directory tree viewer|pkg|tree|
-017|Zip|System|ZIP archive utility|pkg|zip|
-018|Unzip|System|ZIP extraction utility|pkg|unzip|
-019|Nano|Development|Terminal text editor|pkg|nano|
-020|Vim|Development|Terminal text editor|pkg|vim|
-021|JQ|Development|JSON command-line processor|pkg|jq|
-022|HTop|System|Interactive process viewer|pkg|htop|
-023|SQLite|Development|SQLite database engine|pkg|sqlite|
-024|Grep|System|Text searching utility|pkg|grep|
-025|Sed|System|Stream editor|pkg|sed|
-026|Awk|System|Text processing utility|pkg|gawk|
-027|Learning Lab|Security Learning|Authorized security-learning exercises|local|learning|
-028|CLI Practice|Learning|Command-line practice module|local|cli|
-029|Git Practice|Learning|Git learning module|local|gitpractice|
-030|Python HTTP Server|Networking|Simple local HTTP development server|pkg|python|
+006|Go|Development|Go programming language|pkg|golang|
+007|Rust|Development|Rust programming language|pkg|rust|
+008|Make|Development|Build automation utility|pkg|make|
+009|CMake|Development|Cross-platform build system|pkg|cmake|
+010|Clang|Development|C/C++ compiler|pkg|clang|
+011|GDB|Development|GNU debugger|pkg|gdb|
+012|Nano|Development|Terminal text editor|pkg|nano|
+013|Vim|Development|Terminal text editor|pkg|vim|
+014|JQ|Development|JSON command-line processor|pkg|jq|
+015|SQLite|Development|SQLite database engine|pkg|sqlite|
+016|Grep|System|Text searching utility|pkg|grep|
+017|Sed|System|Stream editor|pkg|sed|
+018|Awk|System|Text processing utility|pkg|gawk|
+019|Tree|System|Directory tree viewer|pkg|tree|
+020|HTop|System|Interactive process viewer|pkg|htop|
+021|Zip|System|ZIP archive utility|pkg|zip|
+022|Unzip|System|ZIP extraction utility|pkg|unzip|
+023|Tar|System|Archive utility|pkg|tar|
+024|Coreutils|System|GNU core command utilities|pkg|coreutils|
+025|Findutils|System|File search utilities|pkg|findutils|
+026|Diffutils|System|File comparison utilities|pkg|diffutils|
+027|Less|System|Terminal pager|pkg|less|
+028|File|System|File type identification utility|pkg|file|
+029|Which|System|Command location utility|pkg|which|
+030|Procps|System|Process utilities|pkg|procps|
+031|Curl|Networking|Command-line HTTP client|pkg|curl|
+032|Wget|Networking|Network downloader|pkg|wget|
+033|OpenSSH|Networking|SSH client and server|pkg|openssh|
+034|Netcat|Networking|Network utility|pkg|netcat-openbsd|
+035|DNS Utils|Networking|DNS lookup utilities|pkg|dnsutils|
+036|Whois|Networking|Domain registration lookup|pkg|whois|
+037|Nmap|Security Learning|Network discovery and auditing lab tool|pkg|nmap|
+038|OpenSSL|Security Learning|TLS and cryptography command-line toolkit|pkg|openssl|
+039|Tcpdump|Security Learning|Network packet analysis for authorized labs|pkg|tcpdump|
+040|Python HTTP Server|Networking|Simple local HTTP development server|pkg|python|
+041|Learning Lab|Security Learning|Authorized security-learning exercises|local|learning|
+042|CLI Practice|Learning|Command-line practice module|local|cli|
+043|Git Practice|Learning|Git learning module|local|gitpractice|
+044|Python Practice|Learning|Python practice module|local|pythonpractice|
+045|HTTP Basics|Learning|HTTP fundamentals learning module|local|httpbasics|
+046|DNS Basics|Learning|DNS fundamentals learning module|local|dnsbasics|
+047|Linux Permissions|Learning|Linux permissions practice module|local|permissions|
+048|Log Analysis|Learning|Basic defensive log-analysis exercises|local|logs|
+049|JSON Practice|Learning|JSON and jq practice module|local|jsonpractice|
+050|Shell Practice|Learning|Bash and shell scripting exercises|local|shellpractice|
