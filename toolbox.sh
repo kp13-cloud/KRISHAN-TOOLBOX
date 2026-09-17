@@ -8,6 +8,7 @@ TOOLS="$BASE_DIR/tools"
 
 mkdir -p "$CACHE" "$TOOLS"
 source "$BASE_DIR/modules/dependencies.sh"
+source "$BASE_DIR/modules/backup-restore.sh"
 
 C='\033[1;36m'
 G='\033[1;32m'
@@ -882,7 +883,8 @@ main() {
         echo -e "${Y}[9]${N} About"
         echo -e "${Y}[10]${N} Update Tool Catalog"
         echo -e "${Y}[11]${N} Installed Tools"
-        echo -e "${Y}[12]${N} Exit"
+        echo -e "${Y}[12]${N} Backup & Restore"
+        echo -e "${Y}[13]${N} Exit"
         echo
 
         read -p "Select: " option
@@ -929,6 +931,10 @@ main() {
                 ;;
 
             12)
+                backup_restore
+                ;;
+
+            13)
                 clear
                 exit 0
                 ;;
