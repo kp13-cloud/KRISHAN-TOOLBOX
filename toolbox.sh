@@ -133,22 +133,54 @@ browse_tools() {
 }
 
 search_tools() {
-    read -p "Search name/category: " query
+    clear
+    banner
+
+    echo -e "${C}════════════════════════════════════════════════════════${N}"
+    echo -e "${Y}                    TOOL SEARCH${N}"
+    echo -e "${C}════════════════════════════════════════════════════════${N}"
     echo
 
-    grep -i "$query" "$CATALOG" |
-    while IFS='|' read -r id name category description type target
+    read -rp "Search name, category, or description: " query
+
+    [ -z "$query" ] && return
+
+    echo
+    echo -e "${G}Results for:${N} $query"
+    echo
+
+    local found=0
+
+    while IFS='|' read -r id name category description type target deps
     do
-        status_icon "$type" "$target" >/tmp/kt_status
-        status=$(cat /tmp/kt_status)
+        [ -z "$id" ] && continue
 
-        echo -e "$status ${Y}[$id]${N} $name"
-        echo -e "    ${C}$category${N} - $description"
-        echo
-    done
+        if printf '%s\n' "$name $category $description" |
+            grep -qiF -- "$query"; then
 
-    read -p "Enter tool number to install, or Enter to return: " id
-    [ -n "$id" ] && install_tool "$id"
+            echo -e "${Y}[$id]${N} ${W}$name${N}"
+            echo -e "     Category: $category"
+            echo -e "     $description"
+
+            if [ "$type" = "pkg" ]; then
+                echo -e "     Type: Termux package"
+            elif [ "$type" = "github" ]; then
+                echo -e "     Type: GitHub project"
+            elif [ "$type" = "local" ]; then
+                echo -e "     Type: Learning module"
+            fi
+
+            echo
+            found=1
+        fi
+    done < "$CATALOG"
+
+    if [ "$found" -eq 0 ]; then
+        echo -e "${R}[!] No matching tools found.${N}"
+    fi
+
+    echo
+    read -rp "Press Enter to return..."
 }
 
 tool_info() {
@@ -691,6 +723,21 @@ dashboard() {
         echo -e "${W}Catalog:${N}             Available"
     else
         echo -e "${W}Catalog:${N}             Missing"
+    fi
+
+    if [ -f "$CATALOG" ]; then
+        echo
+        echo -e "${C}Category Statistics:${N}"
+
+        awk -F'|' '
+            /^[0-9]{3}\|/ {
+                count[$3]++
+            }
+            END {
+                for (category in count)
+                    printf "  %-20s %d\\n", category ":", count[category]
+            }
+        ' "$CATALOG" | sort
     fi
 
     echo -e "${C}════════════════════════════════════════════════════════${N}"
