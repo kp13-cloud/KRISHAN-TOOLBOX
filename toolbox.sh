@@ -195,54 +195,100 @@ tool_info() {
  
 install_tool() {
     local id="$1"
-
     local entry
-    entry=$(grep "^$(printf '%03d' "$id")|" "$CATALOG")
 
+    entry=$(grep "^$(printf '%03d' "$id")|" "$CATALOG")
     [ -z "$entry" ] && entry=$(grep "^$id|" "$CATALOG")
 
     if [ -z "$entry" ]; then
-        echo -e "${R}Tool $id not found.${N}"
-        return
+        echo -e "${R}[!] Tool $id not found.${N}"
+        return 1
     fi
 
     IFS='|' read -r num name category description type target dependencies <<< "$entry"
 
+    banner
+
+    echo -e "${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
+    echo -e "${C}Installing: ${W}$name${N}"
+    echo -e "${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
     echo
-    echo -e "${C}Tool:${N} $name"
-    echo -e "${C}Category:${N} $category"
+    echo -e "${C}Category:${N}    $category"
     echo -e "${C}Description:${N} $description"
-    echo -e "${C}Source:${N} $type"
+    echo -e "${C}Source:${N}       $type"
     echo
 
     if is_installed "$type" "$target"; then
         echo -e "${G}[✓] Already installed.${N}"
-        return
+        return 0
     fi
 
-    read -p "Install $name? [y/N]: " answer
-    [[ "$answer" != "y" && "$answer" != "Y" ]] && return
+    if [ -n "$dependencies" ]; then
+        echo -e "${Y}[+] Checking dependencies...${N}"
+        install_dependencies "$dependencies" || {
+            echo -e "${R}[!] Dependency installation failed.${N}"
+            return 1
+        }
+    fi
 
-    install_dependencies "$dependencies"
+    read -p "Continue with $name? [y/N]: " answer
+
+    if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
+        echo -e "${Y}[i] Installation cancelled.${N}"
+        return 0
+    fi
+
+    echo
 
     case "$type" in
         pkg)
-            echo -e "${Y}[+] Installing Termux package...${N}"
-            pkg install -y "$target"
+            echo -e "${Y}[+] Installing Termux package: $target${N}"
+            echo
+
+            if pkg install -y "$target"; then
+                echo
+                if is_installed "$type" "$target"; then
+                    echo -e "${G}[✓] $name installed successfully.${N}"
+                else
+                    echo -e "${Y}[i] Package installed, but its command could not be verified.${N}"
+                fi
+            else
+                echo
+                echo -e "${R}[!] Failed to install $name.${N}"
+                echo -e "${Y}[i] Check your Termux repositories and internet connection.${N}"
+                return 1
+            fi
             ;;
 
         github)
             local dirname
             dirname="$(basename "$target" .git)"
 
-            echo -e "${Y}[+] Downloading authorized GitHub project...${N}"
+            if [ -d "$TOOLS/$dirname" ]; then
+                echo -e "${Y}[i] Project directory already exists.${N}"
+                return 0
+            fi
 
-            if command -v git >/dev/null 2>&1; then
-                git clone "$target" "$TOOLS/$dirname"
+            if ! command -v git >/dev/null 2>&1; then
+                echo -e "${Y}[+] Git is required. Installing Git...${N}"
+
+                if ! pkg install -y git; then
+                    echo -e "${R}[!] Could not install Git.${N}"
+                    return 1
+                fi
+            fi
+
+            echo -e "${Y}[+] Downloading authorized GitHub project...${N}"
+            echo
+
+            if git clone "$target" "$TOOLS/$dirname"; then
+                echo
+                echo -e "${G}[✓] $name downloaded successfully.${N}"
             else
-                echo -e "${Y}[+] Installing Git...${N}"
-                pkg install -y git
-                git clone "$target" "$TOOLS/$dirname"
+                echo
+                echo -e "${R}[!] Failed to download $name.${N}"
+                rm -rf "$TOOLS/$dirname"
+                return 1
             fi
             ;;
 
@@ -277,17 +323,63 @@ LEARN
                     printf '# Git Practice\n\nPractice Git locally.\n' \
                         > "$TOOLS/gitpractice/README.md"
                     ;;
+
+                pythonpractice)
+                    mkdir -p "$TOOLS/pythonpractice"
+                    printf '# Python Practice\n\nPractice Python locally in Termux.\n' \
+                        > "$TOOLS/pythonpractice/README.md"
+                    ;;
+
+                httpbasics)
+                    mkdir -p "$TOOLS/httpbasics"
+                    printf '# HTTP Basics\n\nLearn HTTP fundamentals using local development systems.\n' \
+                        > "$TOOLS/httpbasics/README.md"
+                    ;;
+
+                dnsbasics)
+                    mkdir -p "$TOOLS/dnsbasics"
+                    printf '# DNS Basics\n\nLearn DNS concepts in authorized environments.\n' \
+                        > "$TOOLS/dnsbasics/README.md"
+                    ;;
+
+                permissions)
+                    mkdir -p "$TOOLS/permissions"
+                    printf '# Linux Permissions\n\nPractice Linux permissions on files you own.\n' \
+                        > "$TOOLS/permissions/README.md"
+                    ;;
+
+                logs)
+                    mkdir -p "$TOOLS/logs"
+                    printf '# Log Analysis\n\nPractice defensive log analysis with local sample files.\n' \
+                        > "$TOOLS/logs/README.md"
+                    ;;
+
+                jsonpractice)
+                    mkdir -p "$TOOLS/jsonpractice"
+                    printf '# JSON Practice\n\nPractice JSON processing with jq.\n' \
+                        > "$TOOLS/jsonpractice/README.md"
+                    ;;
+
+                shellpractice)
+                    mkdir -p "$TOOLS/shellpractice"
+                    printf '# Shell Practice\n\nPractice Bash scripting locally.\n' \
+                        > "$TOOLS/shellpractice/README.md"
+                    ;;
             esac
+
+            echo -e "${G}[✓] $name installed successfully.${N}"
+            ;;
+
+        *)
+            echo -e "${R}[!] Unknown installation type: $type${N}"
+            return 1
             ;;
     esac
 
     echo
-    if is_installed "$type" "$target"; then
-        echo -e "${G}[✓] $name installed successfully.${N}"
-    else
-        echo -e "${R}[!] Installation did not complete.${N}"
-    fi
+    read -p "Press Enter..."
 }
+
 
 categories() {
     banner
