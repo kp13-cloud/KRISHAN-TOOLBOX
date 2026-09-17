@@ -525,6 +525,108 @@ about() {
     read -p "Press Enter..."
 }
 
+
+installed_tools() {
+    while true; do
+        clear
+        banner
+
+        echo -e "${C}════════════════════════════════════════════════════════${N}"
+        echo -e "${Y}                 INSTALLED TOOLS${N}"
+        echo -e "${C}════════════════════════════════════════════════════════${N}"
+        echo
+
+        local found=0
+        local i=1
+        local dirs=()
+
+        if [ -d "$TOOLS" ]; then
+            while IFS= read -r dir; do
+                [ -d "$dir" ] || continue
+                local name
+                name="$(basename "$dir")"
+
+                echo -e "${G}[$i]${N} ${W}$name${N}"
+                dirs+=("$dir")
+                i=$((i + 1))
+                found=1
+            done < <(find "$TOOLS" -mindepth 1 -maxdepth 1 -type d | sort)
+        fi
+
+        if [ "$found" -eq 0 ]; then
+            echo -e "${Y}No locally installed tools found.${N}"
+            echo
+            read -rp "Press Enter to return..."
+            return
+        fi
+
+        echo
+        echo -e "${C}[O]${N} Open tool directory"
+        echo -e "${C}[R]${N} Remove local tool"
+        echo -e "${C}[Q]${N} Back"
+        echo
+
+        read -rp "Select: " choice
+        choice="${choice,,}"
+
+        case "$choice" in
+            q)
+                return
+                ;;
+
+            o)
+                read -rp "Enter tool number: " num
+
+                if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#dirs[@]}" ]; then
+                    cd "${dirs[$((num-1))]}" || continue
+                    echo
+                    echo -e "${G}Opened:${N} $(pwd)"
+                    echo
+                    ls -la
+                    echo
+                    read -rp "Press Enter to return..."
+                else
+                    echo -e "${R}[!] Invalid tool number.${N}"
+                    sleep 1
+                fi
+                ;;
+
+            r)
+                read -rp "Enter tool number to remove: " num
+
+                if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#dirs[@]}" ]; then
+                    target="${dirs[$((num-1))]}"
+                    name="$(basename "$target")"
+
+                    echo
+                    echo -e "${Y}You are about to remove:${N} $name"
+                    echo -e "${Y}Only the local toolbox copy will be removed.${N}"
+                    echo
+
+                    read -rp "Type REMOVE to confirm: " confirm
+
+                    if [ "$confirm" = "REMOVE" ]; then
+                        rm -rf -- "$target"
+                        echo -e "${G}[✓] $name removed.${N}"
+                    else
+                        echo -e "${Y}[i] Removal cancelled.${N}"
+                    fi
+
+                    sleep 1
+                else
+                    echo -e "${R}[!] Invalid tool number.${N}"
+                    sleep 1
+                fi
+                ;;
+
+            *)
+                echo -e "${R}[!] Invalid option.${N}"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
 main() {
     while true
     do
@@ -539,7 +641,8 @@ main() {
         echo -e "${Y}[7]${N} System Health"
         echo -e "${Y}[8]${N} About"
         echo -e "${Y}[9]${N} Update Tool Catalog"
-        echo -e "${Y}[10]${N} Exit"
+        echo -e "${Y}[10]${N} Installed Tools"
+        echo -e "${Y}[11]${N} Exit"
         echo
 
         read -p "Select: " option
@@ -579,6 +682,10 @@ main() {
                 read -p "Press Enter..."
                 ;;
             10)
+                installed_tools
+                ;;
+
+            11)
                 clear
                 exit 0
                 ;;
