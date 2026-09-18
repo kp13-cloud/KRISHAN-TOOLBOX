@@ -13,17 +13,24 @@ create_backup() {
     echo
     echo "[+] Creating backup..."
 
-    tar -czf "$file" \
+    mkdir -p "$BASE_DIR/config"
+
+    # Ensure optional configuration files exist.
+    [ -f "$BASE_DIR/config/catalog.db" ] || touch "$BASE_DIR/config/catalog.db"
+    [ -f "$BASE_DIR/config/favorites.db" ] || touch "$BASE_DIR/config/favorites.db"
+
+    if tar -czf "$file" \
         -C "$BASE_DIR" \
         config/catalog.db \
-        config/favorites.db \
-        2>/dev/null
-
-    if [ $? -eq 0 ]; then
-        echo "[✓] Backup created:"
-        echo "    $file"
+        config/favorites.db
+    then
+        echo
+        echo "[✓] Backup created successfully."
+        echo "    $(basename "$file")"
+        echo "    Location: $file"
     else
         rm -f "$file"
+        echo
         echo "[!] Backup failed."
     fi
 
@@ -52,6 +59,7 @@ restore_backup() {
     echo
 
     local files=()
+
     while IFS= read -r file; do
         files+=("$file")
     done < <(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'toolbox-*.tar.gz' | sort)
@@ -63,6 +71,7 @@ restore_backup() {
     fi
 
     local i=1
+
     for file in "${files[@]}"; do
         echo "[$i] $(basename "$file")"
         i=$((i + 1))
